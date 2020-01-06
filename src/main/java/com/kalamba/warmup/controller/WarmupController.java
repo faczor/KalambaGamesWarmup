@@ -38,11 +38,11 @@ public class WarmupController {
     public ResponseEntity makeAction(@RequestBody NewActionDto newActionDto) throws UserNotFoundException, GameNotFoundException {
         System.out.println(newActionDto.getUserId() + ", " + newActionDto.getGameId() + ", " + newActionDto.getAction());
         Optional<User> optionalUser = userRepository.findById(newActionDto.getUserId());
-        if(optionalUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User with id: " + newActionDto.getUserId() + " not found");
         }
         Optional<Game> gameOptional = gameRepository.findById(newActionDto.getUserId());
-        if(gameOptional.isEmpty()) {
+        if (gameOptional.isEmpty()) {
             throw new GameNotFoundException("Game with id: " + newActionDto.getGameId() + " not found");
         }
         actionRepository.save(new Action(newActionDto.getAction(), optionalUser.get(), gameOptional.get()));
