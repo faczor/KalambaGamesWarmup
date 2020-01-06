@@ -1,5 +1,6 @@
 package com.kalamba.warmup.controller;
 
+import com.kalamba.warmup.exception.EmptyActionException;
 import com.kalamba.warmup.exception.GameNotFoundException;
 import com.kalamba.warmup.exception.UserNotFoundException;
 import com.kalamba.warmup.model.Action;
@@ -35,15 +36,17 @@ public class WarmupController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/api/newAction")
-    public ResponseEntity makeAction(@RequestBody NewActionDto newActionDto) throws UserNotFoundException, GameNotFoundException {
-        System.out.println(newActionDto.getUserId() + ", " + newActionDto.getGameId() + ", " + newActionDto.getAction());
+    public ResponseEntity makeAction(@RequestBody NewActionDto newActionDto) throws UserNotFoundException, GameNotFoundException, EmptyActionException {
         Optional<User> optionalUser = userRepository.findById(newActionDto.getUserId());
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException("User with id: " + newActionDto.getUserId() + " not found");
         }
-        Optional<Game> gameOptional = gameRepository.findById(newActionDto.getUserId());
+        Optional<Game> gameOptional = gameRepository.findById(newActionDto.getGameId());
         if (gameOptional.isEmpty()) {
             throw new GameNotFoundException("Game with id: " + newActionDto.getGameId() + " not found");
+        }
+        if(newActionDto.getAction().equals("")) {
+            throw new EmptyActionException("Action is empty");
         }
         actionRepository.save(new Action(newActionDto.getAction(), optionalUser.get(), gameOptional.get()));
         return ResponseEntity.ok(LOG_MESSAGE_SUCCES);
